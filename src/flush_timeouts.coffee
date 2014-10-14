@@ -1,7 +1,6 @@
 do ->
   scheduledTimeouts = []
-  lastFlushedTimeouts = []
-  isFlushingOngoing = false
+  currentTimeoutBeingFlushed = null
   root = null
   if typeof process isnt 'undefined'
     root = global
@@ -11,7 +10,7 @@ do ->
   root.originalSetTimeout = root.setTimeout
 
   root.setTimeout = (callback, delay) ->
-    if isFlushingOngoing and isCallbackAlreadyScheduled callback
+    if timeoutWouldResultInRecursion callback
       return
     timeoutId = root.originalSetTimeout ->
       removeTimeout timeoutId
@@ -20,28 +19,29 @@ do ->
     scheduledTimeouts.push
       timeoutId: timeoutId
       callback: callback
+      parent: currentTimeoutBeingFlushed
     timeoutId
 
 
   root.flushTimeouts = ->
     if scheduledTimeouts.length is 0
       throw new Error 'flushTimeouts: No timeouts scheduled which could be flushed.'
-    isFlushingOngoing = true
-    lastFlushedTimeouts = []
-    while (timeout = scheduledTimeouts.shift())
-      lastFlushedTimeouts.push timeout
-      clearTimeout timeout.timeoutId
-      timeout.callback()
-    isFlushingOngoing = false
-
+    while (currentTimeoutBeingFlushed = scheduledTimeouts.shift())
+      clearTimeout currentTimeoutBeingFlushed.timeoutId
+      currentTimeoutBeingFlushed.callback()
+    currentTimeoutBeingFlushed = null
 
   removeTimeout = (timeoutId) ->
     scheduledTimeouts = scheduledTimeouts.filter (timeout) -> timeout.timeoutId isnt timeoutId
 
 
-  isCallbackAlreadyScheduled = (callback) ->
-    callbacksToCheck = scheduledTimeouts.map (timeout) -> timeout.callback
-    callbacksToCheck = callbacksToCheck.concat lastFlushedTimeouts.map (timeout) -> timeout.callback
+  timeoutWouldResultInRecursion = (callback) ->
+    if currentTimeoutBeingFlushed is null
+      return false
+    timeout = currentTimeoutBeingFlushed
+    callbacksToCheck = [timeout.callback]
+    while (timeout = timeout.parent)
+      callbacksToCheck.push timeout.callback
     callbacksToCheck.some (callbackToCheck) ->
       areCallbacksIdentical callback, callbackToCheck
 

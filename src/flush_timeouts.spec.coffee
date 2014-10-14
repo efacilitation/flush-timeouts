@@ -118,7 +118,7 @@ describe 'flushTimeouts', ->
 
   describe 'given one timeout which registers itself as a timeout again (interval emulation)', ->
     describe 'when i execute flushTimeouts()', ->
-      it 'should execute the timeout only once and not register it again to prevent recursion', ->
+      it 'should execute the timeout only once and not again in order to prevent recursion', ->
         interval = ->
           executionCounter++
           setTimeout interval, 0
@@ -127,9 +127,9 @@ describe 'flushTimeouts', ->
         expect(executionCounter).to.equal 1
 
 
-  describe 'given one timeout which registers a timeout which has an identical callback to an already scheduled', ->
+  describe 'given one timeout which registers another timeout which then register the first timeout again', ->
     describe 'when i execute flushTimeouts()', ->
-      it 'should not register the timeout with the identical callback again to prevent recursion', ->
+      it 'should execute the first and the second timeout once but not again the first one in order to prevent recursion', ->
         ping = ->
           executionCounter++
           setTimeout pong, 0
@@ -139,3 +139,18 @@ describe 'flushTimeouts', ->
         setTimeout ping, 0
         flushTimeouts()
         expect(executionCounter).to.equal 2
+
+
+  describe 'given two timeouts which register each other again as timeouts', ->
+    describe 'when i execute flushTimeouts()', ->
+      it 'should execute the first timeout followed by the second one and vice versa but also prevent further calls', ->
+        ping = ->
+          executionCounter++
+          setTimeout pong, 0
+        pong = ->
+          executionCounter++
+          setTimeout ping, 0
+        setTimeout ping, 0
+        setTimeout pong, 0
+        flushTimeouts()
+        expect(executionCounter).to.equal 4
