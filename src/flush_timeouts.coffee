@@ -1,6 +1,6 @@
 do ->
   scheduledTimeouts = []
-  currentTimeoutBeingFlushed = null
+  currentFlushedTimeout = null
   root = null
   if typeof process isnt 'undefined'
     root = global
@@ -10,8 +10,6 @@ do ->
   root.originalSetTimeout = root.setTimeout
 
   root.setTimeout = (callback, delay) ->
-    if timeoutWouldResultInRecursion callback
-      return
     timeoutId = root.originalSetTimeout ->
       removeTimeout timeoutId
       callback()
@@ -19,31 +17,31 @@ do ->
     scheduledTimeouts.push
       timeoutId: timeoutId
       callback: callback
-      parent: currentTimeoutBeingFlushed
+      parent: currentFlushedTimeout
     timeoutId
 
 
-  root.flushTimeouts = ->
+  root.flushTimeouts = (allowedCallStackSize = 1000) ->
     if scheduledTimeouts.length is 0
       throw new Error 'flushTimeouts: No timeouts scheduled which could be flushed.'
-    while (currentTimeoutBeingFlushed = scheduledTimeouts.shift())
-      clearTimeout currentTimeoutBeingFlushed.timeoutId
-      currentTimeoutBeingFlushed.callback()
-    currentTimeoutBeingFlushed = null
+    while (currentFlushedTimeout = scheduledTimeouts.shift())
+      clearTimeout currentFlushedTimeout.timeoutId
+      if not timeoutWouldResultInRecursion currentFlushedTimeout, allowedCallStackSize
+        currentFlushedTimeout.callback()
+    currentFlushedTimeout = null
 
   removeTimeout = (timeoutId) ->
     scheduledTimeouts = scheduledTimeouts.filter (timeout) -> timeout.timeoutId isnt timeoutId
 
 
-  timeoutWouldResultInRecursion = (callback) ->
-    if currentTimeoutBeingFlushed is null
-      return false
-    timeout = currentTimeoutBeingFlushed
-    callbacksToCheck = [timeout.callback]
+  timeoutWouldResultInRecursion = (timeoutToCheck, allowedCallStackSize) ->
+    parentCallbacks = []
+    timeout = timeoutToCheck
     while (timeout = timeout.parent)
-      callbacksToCheck.push timeout.callback
-    callbacksToCheck.some (callbackToCheck) ->
-      areCallbacksIdentical callback, callbackToCheck
+      parentCallbacks.push timeout.callback
+    identicalCallbacks = parentCallbacks.filter (parentCallback) ->
+      areCallbacksIdentical timeoutToCheck.callback, parentCallback
+    identicalCallbacks.length >= allowedCallStackSize
 
 
   areCallbacksIdentical = (callback1, callback2) ->

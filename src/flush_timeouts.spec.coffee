@@ -117,40 +117,56 @@ describe 'flushTimeouts', ->
 
 
   describe 'given one timeout which registers itself as a timeout again (interval emulation)', ->
-    describe 'when i execute flushTimeouts()', ->
-      it 'should execute the timeout only once and not again in order to prevent recursion', ->
+    describe 'when i execute flushTimeouts() with an allowed call stack size of 10', ->
+      it 'should execute the timeout only ten times', ->
+        interval = ->
+          executionCounter++
+          setTimeout interval, 0
+        setTimeout interval, 0
+        flushTimeouts 10
+        expect(executionCounter).to.equal 10
+
+
+    describe 'when i execute flushTimeouts() with a default allowed call stack size', ->
+      it 'should execute the timeout only one thousand times', ->
         interval = ->
           executionCounter++
           setTimeout interval, 0
         setTimeout interval, 0
         flushTimeouts()
-        expect(executionCounter).to.equal 1
+        expect(executionCounter).to.equal 1000
 
 
   describe 'given one timeout which registers another timeout which then register the first timeout again', ->
-    describe 'when i execute flushTimeouts()', ->
-      it 'should execute the first and the second timeout once but not again the first one in order to prevent recursion', ->
+    describe 'when i execute flushTimeouts() with an allowed call stack size of 10', ->
+      it 'should execute the first and the second timeout each only ten times', ->
+        pingCounter = 0
         ping = ->
-          executionCounter++
+          pingCounter++
           setTimeout pong, 0
+        pongCounter = 0
         pong = ->
-          executionCounter++
+          pongCounter++
           setTimeout ping, 0
         setTimeout ping, 0
-        flushTimeouts()
-        expect(executionCounter).to.equal 2
+        flushTimeouts 10
+        expect(pingCounter).to.equal 10
+        expect(pongCounter).to.equal 10
 
 
   describe 'given two timeouts which register each other again as timeouts', ->
-    describe 'when i execute flushTimeouts()', ->
-      it 'should execute the first timeout followed by the second one and vice versa but also prevent further calls', ->
+    describe 'when i execute flushTimeouts() with an allowed call stack size of 10', ->
+      it 'should execute the first and the second timeout each ten times in each run', ->
+        pingCounter = 0
         ping = ->
-          executionCounter++
+          pingCounter++
           setTimeout pong, 0
+        pongCounter = 0
         pong = ->
-          executionCounter++
+          pongCounter++
           setTimeout ping, 0
         setTimeout ping, 0
         setTimeout pong, 0
-        flushTimeouts()
-        expect(executionCounter).to.equal 4
+        flushTimeouts 10
+        expect(pingCounter).to.equal 20
+        expect(pongCounter).to.equal 20
