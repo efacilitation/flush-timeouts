@@ -114,3 +114,28 @@ describe 'flushTimeouts', ->
         , 0
         flushTimeouts()
         expect(message).to.equal 'Hello World'
+
+
+  describe 'given one timeout which registers itself as a timeout again (interval emulation)', ->
+    describe 'when i execute flushTimeouts()', ->
+      it 'should execute the timeout only once and not register it again to prevent recursion', ->
+        interval = ->
+          executionCounter++
+          setTimeout interval, 0
+        setTimeout interval, 0
+        flushTimeouts()
+        expect(executionCounter).to.equal 1
+
+
+  describe 'given one timeout which registers a timeout which has an identical callback to an already scheduled', ->
+    describe 'when i execute flushTimeouts()', ->
+      it 'should not register the timeout with the identical callback again to prevent recursion', ->
+        ping = ->
+          executionCounter++
+          setTimeout pong, 0
+        pong = ->
+          executionCounter++
+          setTimeout ping, 0
+        setTimeout ping, 0
+        flushTimeouts()
+        expect(executionCounter).to.equal 2

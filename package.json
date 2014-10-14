@@ -7,7 +7,7 @@
     "testing"
   ],
   "author": "eFa Team <team@efa-gmbh.com>",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/efacilitation/flush-timeouts.git"
