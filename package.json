@@ -1,0 +1,47 @@
+{
+  "name": "flush-timeouts",
+  "description": "Override setTimeout and provide flushing capabilities",
+  "keywords": [
+    "setTimeout",
+    "flush-timeout",
+    "testing"
+  ],
+  "author": "eFa Team <team@efa-gmbh.com>",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/efacilitation/flush-timeouts.git"
+  },
+  "main": "dist/flush_timeouts.js",
+  "scripts": {
+    "test": "node_modules/.bin/gulp spec",
+    "prepublish": "node_modules/.bin/gulp build"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "coffee-script": "*",
+    "gulp": "*",
+    "gulp-clean": "*",
+    "gulp-util": "*",
+    "gulp-mocha": "*",
+    "gulp-watch": "*",
+    "gulp-coffee": "*",
+    "gulp-concat": "*",
+    "gulp-newer": "*",
+    "karma": "*",
+    "karma-chai": "*",
+    "karma-coffee-preprocessor": "*",
+    "karma-phantomjs-launcher": "*",
+    "karma-spec-reporter": "*",
+    "karma-mocha": "*",
+    "mocha": "*",
+    "run-sequence": "*",
+    "gulp-bump": "*"
+  },
+  "dependencies": {},
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}

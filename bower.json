@@ -1,0 +1,24 @@
+{
+  "name": "flush-timeouts",
+  "version": "0.0.1",
+  "homepage": "https://github.com/efacilitation/flush-timeouts",
+  "authors": [
+    "efa GmbH <team@efa-gmbh.com>"
+  ],
+  "description": "Override setTimeout and provide flushing capabilities",
+  "main": "dist/flush_timeouts.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "setTimeout",
+    "flush-timeout",
+    "testing"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

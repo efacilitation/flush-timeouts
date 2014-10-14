@@ -1,0 +1,11 @@
+.DS_Store
+/dist
+/node_modules
+/bower_components
+/npm-debug.log
+/*.sublime-project
+/*.sublime-workspace
+
+.floo
+.flooignore
+.idea/
