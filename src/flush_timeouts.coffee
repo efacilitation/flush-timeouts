@@ -21,7 +21,7 @@ do ->
     timeoutId
 
 
-  root.flushTimeouts = (allowedCallStackSize = 1000) ->
+  root.flushTimeouts = (allowedCallStackSize = root.flushTimeouts.allowedCallStackSize) ->
     if scheduledTimeouts.length is 0
       throw new Error 'flushTimeouts: No timeouts scheduled which could be flushed.'
     while (currentFlushedTimeout = scheduledTimeouts.shift())
@@ -29,6 +29,9 @@ do ->
       if not timeoutWouldResultInRecursion currentFlushedTimeout, allowedCallStackSize
         currentFlushedTimeout.callback()
     currentFlushedTimeout = null
+
+
+  root.flushTimeouts.allowedCallStackSize = 10
 
   removeTimeout = (timeoutId) ->
     scheduledTimeouts = scheduledTimeouts.filter (timeout) -> timeout.timeoutId isnt timeoutId

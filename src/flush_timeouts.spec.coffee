@@ -117,24 +117,52 @@ describe 'flushTimeouts', ->
 
 
   describe 'given one timeout which registers itself as a timeout again (interval emulation)', ->
-    describe 'when i execute flushTimeouts() with an allowed call stack size of 10', ->
-      it 'should execute the timeout only ten times', ->
-        interval = ->
-          executionCounter++
-          setTimeout interval, 0
-        setTimeout interval, 0
-        flushTimeouts 10
-        expect(executionCounter).to.equal 10
-
-
     describe 'when i execute flushTimeouts() with a default allowed call stack size', ->
-      it 'should execute the timeout only one thousand times', ->
+      it 'should execute the timeout ten times', ->
         interval = ->
           executionCounter++
           setTimeout interval, 0
         setTimeout interval, 0
         flushTimeouts()
-        expect(executionCounter).to.equal 1000
+        expect(executionCounter).to.equal 10
+
+
+    describe 'when i execute flushTimeouts() passing in an allowed call stack size of 1', ->
+      it 'should execute the timeout only once', ->
+        interval = ->
+          executionCounter++
+          setTimeout interval, 0
+        setTimeout interval, 0
+        flushTimeouts 1
+        expect(executionCounter).to.equal 1
+
+
+      it 'should use the default allowed call stack size on consecutive calls', ->
+        interval = ->
+          executionCounter++
+          setTimeout interval, 0
+        setTimeout interval, 0
+        flushTimeouts 1
+        setTimeout interval, 0
+        flushTimeouts()
+        expect(executionCounter).to.equal 
+
+
+
+    describe 'when i change the global allowed stack size to 1 and execute flushTimeouts() multiple times', ->
+      it 'should always use the globally configured allowed call stack size', ->
+        defaultAllowedCallStackSize = flushTimeouts.allowedCallStackSize
+        flushTimeouts.allowedCallStackSize = 1
+        interval = ->
+          executionCounter++
+          setTimeout interval, 0
+        setTimeout interval, 0
+        flushTimeouts()
+        setTimeout interval, 0
+        flushTimeouts()
+        expect(executionCounter).to.equal 2
+        flushTimeouts.allowedCallStackSize = defaultAllowedCallStackSize
+
 
 
   describe 'given one timeout which registers another timeout which then register the first timeout again', ->
