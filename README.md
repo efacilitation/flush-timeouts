@@ -1,4 +1,4 @@
-# flush-timeout
+# flush-timeout [![Build Status](https://travis-ci.org/efacilitation/flush-timeouts.svg?branch=master)](https://travis-ci.org/efacilitation/flush-timeouts)
 
 Override `setTimeout` and provide flushing capabilities.
 
@@ -11,7 +11,7 @@ Use this if you want to register a not flushable timeout.
 
 ### global.setTimeout
 
-This method is the decorated version of `global.setTimeout`. 
+This method is the decorated version of `global.setTimeout`.
 It schedules the timeout for execution and also saves it in a collection so it can be flushed.
 
 ### global.flushTimeouts(allowedCallStackSize)
