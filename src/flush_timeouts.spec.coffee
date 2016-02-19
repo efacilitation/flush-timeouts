@@ -145,7 +145,7 @@ describe 'flushTimeouts', ->
         flushTimeouts 1
         setTimeout interval, 0
         flushTimeouts()
-        expect(executionCounter).to.equal 
+        expect(executionCounter).to.equal
 
 
 

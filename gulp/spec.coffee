@@ -1,10 +1,10 @@
 mocha       = require 'gulp-mocha'
 runSequence = require 'run-sequence'
-fs          = require 'fs'
+{spawnSync} = require 'child_process'
 
 module.exports = (gulp) ->
-  gulp.task 'spec', (next) ->
-    runSequence 'spec:server', 'spec:client', next
+  gulp.task 'spec', (callback) ->
+    runSequence 'spec:server', 'spec:client', callback
 
 
   gulp.task 'spec:server', ->
@@ -16,10 +16,13 @@ module.exports = (gulp) ->
       .pipe(mocha(reporter: 'spec'))
 
 
-  gulp.task 'spec:client', (next) ->
-    executeChildProcess = require './helper/child_process'
-    executeChildProcess(
-      'Karma specs'
-      'node_modules/karma/bin/karma start'
-      next
-    )
+  gulp.task 'spec:client', ->
+    process.env.karmaConf = "#{__dirname}/../karma.conf.coffee"
+    spawnResult = spawnSync "coffee", ["#{process.cwd()}/gulp/helper/karma_server.coffee"],
+      stdio: [0, 1, 2]
+
+    new Promise (resolve, reject) ->
+      if spawnResult.status is 0
+        resolve()
+      else
+        reject new Error 'Karma run failed.'
