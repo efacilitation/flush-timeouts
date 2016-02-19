@@ -4,4 +4,4 @@ node_js:
 notifications:
   hipchat:
     rooms:
-      secure: YVq72MotB572dfWmu0jikeaeDNSCFmEQr6yJM3IDpJF+hcGFn1DinbY7JdnSu8dgmlFN4FKZOPRwR1D1NyzEhi2zcab9u+wvac5h4CCXX0Q/OTLijcBSwSn1PMyEFlSKPE0/VpxKSIMKvFUk4JF2yXNFHxek1sB6MaprJ9TXHto=
+      secure: F9CaW9Zn4rdRbvmh7O4c0KPPmyIYhkPznhGfsbjtThu6NoUMayBZROBbIcBKovQvisMaxliRUdSl37HL4tX7CxICIHc6iGWzWj1WQLLwujhadW/22InNEc0ZpTIy7JLG1LLcwOKmbm7NfvaBcm4alY5oFDTJGmPNA+ZIwG/etPM=
